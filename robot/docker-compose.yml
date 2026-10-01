@@ -1,0 +1,15 @@
+version: '3'
+services:
+  ros_robot:
+    image: ros_robot:saved
+    container_name: ros_robot
+    network_mode: host
+    privileged: true
+    environment:
+      - ROS_MASTER_URI=http://localhost:11311
+      - ROS_HOSTNAME=localhost
+    volumes:
+      - ~/robot/catkin_ws:/root/catkin_ws
+      - /dev:/dev
+    restart: unless-stopped
+    command: tail -f /dev/null

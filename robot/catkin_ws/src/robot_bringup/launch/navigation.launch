@@ -1,0 +1,33 @@
+<launch>
+  <arg name="map_file" default="$(find robot_bringup)/maps/map.yaml"/>
+
+  <include file="$(find robot_bringup)/launch/robot.launch"/>
+
+  <node name="map_server"
+        pkg="map_server"
+        type="map_server"
+        args="$(arg map_file)"
+        output="screen"/>
+
+  <node name="amcl" pkg="amcl" type="amcl" output="screen">
+    <param name="use_map_topic" value="true"/>
+    <param name="odom_frame_id" value="odom"/>
+    <param name="base_frame_id" value="base_link"/>
+    <param name="global_frame_id" value="map"/>
+    <param name="odom_model_type" value="diff"/>
+    <param name="min_particles" value="500"/>
+    <param name="max_particles" value="2000"/>
+    <param name="update_min_d" value="0.1"/>
+    <param name="update_min_a" value="0.2"/>
+    <param name="laser_max_beams" value="30"/>
+    <param name="laser_max_range" value="8.0"/>
+  </node>
+
+  <node name="move_base" pkg="move_base" type="move_base" output="screen">
+    <rosparam file="$(find robot_bringup)/config/costmap_common.yaml" command="load" ns="global_costmap"/>
+    <rosparam file="$(find robot_bringup)/config/costmap_common.yaml" command="load" ns="local_costmap"/>
+    <rosparam file="$(find robot_bringup)/config/local_costmap.yaml" command="load"/>
+    <rosparam file="$(find robot_bringup)/config/global_costmap.yaml" command="load"/>
+    <rosparam file="$(find robot_bringup)/config/base_local_planner.yaml" command="load"/>
+  </node>
+</launch>

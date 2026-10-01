@@ -1,0 +1,38 @@
+<launch>
+  <arg name="lidar_port" default="/dev/ttyUSB0"/>
+  <arg name="base_port" default="/dev/ttyS2"/>
+  <arg name="baud" default="115200"/>
+
+  <param name="robot_description" textfile="$(find robot_bringup)/urdf/robot.urdf"/>
+
+  <node name="robot_state_publisher"
+        pkg="robot_state_publisher"
+        type="robot_state_publisher"
+        output="screen"/>
+
+  <node name="rplidar" pkg="rplidar_ros" type="rplidarNode" output="screen">
+    <param name="serial_port" value="$(arg lidar_port)"/>
+    <param name="serial_baudrate" value="115200"/>
+    <param name="frame_id" value="laser_frame"/>
+  </node>
+
+  <node name="motor_controller"
+        pkg="motor_controller"
+        type="motor_controller.py"
+        output="screen">
+    <param name="port" value="$(arg base_port)"/>
+    <param name="baud" value="$(arg baud)"/>
+    <param name="wheel_base" value="0.1674"/>
+    <param name="max_wheel_speed" value="0.35"/>
+    <param name="cmd_timeout" value="0.4"/>
+    <param name="motor_a_sign" value="1"/>
+    <param name="motor_b_sign" value="1"/>
+  </node>
+
+  <node name="ekf_localization"
+        pkg="robot_localization"
+        type="ekf_localization_node"
+        output="screen">
+    <rosparam command="load" file="$(find robot_bringup)/config/ekf.yaml"/>
+  </node>
+</launch>
